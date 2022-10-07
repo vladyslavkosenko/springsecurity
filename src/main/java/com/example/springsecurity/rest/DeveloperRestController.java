@@ -1,7 +1,7 @@
 package com.example.springsecurity.rest;
 
 import com.example.springsecurity.model.Developer;
-import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +23,7 @@ public class DeveloperRestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public Developer getById(@PathVariable Long id) {
         return DEVELOPERS.stream()
                 .filter(developer -> developer.getId().equals(id))
@@ -31,12 +32,15 @@ public class DeveloperRestController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Developer create(@RequestBody Developer developer) {
         this.DEVELOPERS.add(developer);
         return developer;
     }
+
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('developers:write')")
+    public void deleteById(@PathVariable Long id) {
         this.DEVELOPERS.removeIf(developer -> developer.getId().equals(id));
     }
 }
