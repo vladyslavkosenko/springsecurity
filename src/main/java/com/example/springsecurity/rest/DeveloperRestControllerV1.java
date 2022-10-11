@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 @RestController
 @RequestMapping("/api/v1/developers")
-public class DeveloperRestController {
-    private final List<Developer> DEVELOPERS = Stream.of(
+public class DeveloperRestControllerV1 {
+    private List<Developer> DEVELOPERS = Stream.of(
             new Developer(1L, "Ivan", "Ivanov"),
-            new Developer(2L, "Kolya", "Ivanov"),
-            new Developer(3L, "Sergey", "Sergeev")
+            new Developer(2L, "Sergey", "Sergeev"),
+            new Developer(3L, "Petr", "Petrov")
     ).collect(Collectors.toList());
 
     @GetMapping
@@ -23,16 +24,15 @@ public class DeveloperRestController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('developers:read')")
     public Developer getById(@PathVariable Long id) {
-        return DEVELOPERS.stream()
-                .filter(developer -> developer.getId().equals(id))
+        return DEVELOPERS.stream().filter(developer -> developer.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('developers:write')")
     public Developer create(@RequestBody Developer developer) {
         this.DEVELOPERS.add(developer);
         return developer;
