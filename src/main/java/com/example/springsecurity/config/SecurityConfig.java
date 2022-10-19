@@ -31,13 +31,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui/**", "/swagger-ui", "/actuator/**", "/actuator").permitAll()
                 .antMatchers("/").permitAll()
-                .antMatchers("/api/v1/auth/login").permitAll()
+                .antMatchers("/auth/login").permitAll()
+                .antMatchers("/auth/success").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .apply(jwtConfigurer);
     }
+
+    private static final String[] AUTH_WHITELIST = {
+            // -- swagger ui
+            "/v2/api-docs",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**"};
 
     @Bean
     @Override
